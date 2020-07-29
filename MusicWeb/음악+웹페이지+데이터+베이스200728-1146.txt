@@ -1,0 +1,96 @@
+﻿create database music; /*데이터베이스를 생성*/
+
+/*유저 테이블*/
+create table member (
+userid varchar(15) not null,  /*아이디*/
+userpw varchar(20) not null,  /*패스워드*/
+userName varchar(20) not null,  /*이름*/
+userBirth date not null,  /*생년월일*/
+userPhone varchar(26) not null,  /*연락처*/
+userMail varchar(50) not null,  /*이메일*/
+userAddress varchar(80),  /*주소*/
+userSignUpDay datetime not null,  /*가입일*/
+userFinalLogin datetime not null,  /*마지막 접속일*/
+userFreeTicket date not null, 
+primary key (userid)
+)ENGINE=InnoDB DEFAULT CHARSET=UTF8;
+
+drop table member;
+select * from member;
+update member set userid='bbb';
+delete from member where userid='aaa';
+
+/*음악테이블*/
+create table musicList (
+musicNum int auto_increment primary key, /*음악번호*/ 
+musicName varchar(50) not null, /*음악이름*/
+musicArtist varchar(50) not null, /*가수명*/
+musicAlbum varchar(50) not null, /*앨범명*/
+musicImgSrc varchar(100) not null /*이미지경로*/
+)ENGINE=InnoDB DEFAULT CHARSET=UTF8;
+
+drop table musiclist;
+insert into music.musiclist (musicName, musicArtist, musicAlbum, musicImgSrc)value ('아무노래','지코','아무노래특집','c://upload');
+select * from musicList;
+update musicList set musicName='자바노래';
+delete from musicList where musicName='자바노래' and musicArtist='이젠';
+select * from music.musicList where musicName like concat('%',?,'%') or musicArtist like concat('%',?,'%') or musicAlbum like concat('%',?,'%')
+SET foreign_key_checks = 0; // 외래키 무시하기
+
+/*랭크테이블*/
+create table rankList (
+rankMusicNum int,   
+rankSearchNum int not null,  /*검색수*/
+rankPlayNum int not null,  /*재생수*/
+FOREIGN KEY(rankMusicNum) REFERENCES musicList(musicNum)
+)ENGINE=InnoDB DEFAULT CHARSET=UTF8;
+
+drop table rankList;
+insert into rankList values (4,3,5);  /*관계키라 있는 테이블만 추가됨*/
+select * from rankList; /*메인화면에서 재생수 출력할 때 사용*/
+update rankList set rankSearchNum=4; /*검색수 또는 플레이 수 추가할 때*/
+delete from rankList where rankMusicNum=1;
+
+
+/*재생목록테이블*/
+create table playList (
+userid varchar(15), /*해당 플레이어의 고유한 재생목록을 만들기 위해 필요*/
+musicNum int, /*외래키*/
+playNum int not null, /*재생목록에서 노래 순번 - 오름차순으로 재생순번 변경*/
+FOREIGN KEY (userid) REFERENCES member (userid),
+FOREIGN KEY(musicNum) REFERENCES musicList(musicNum)
+)ENGINE=InnoDB DEFAULT CHARSET=UTF8;
+
+/*playNum 아이디별로 순번 1개씩 올리기*/
+insert into music.playlist (userid, musicNum, playNum) select 'ice',112, (SELECT COUNT(userid) FROM playlist where userid='ice')+1;
+
+drop table playList;
+insert into playList values('bbb',4,1,'공부할 때 듣는 노래'); /*관계키라 있는 테이블만 추가됨*/
+select * from playList;
+update playList set playNum=5 where userid='bbb' and musicNum=4; /*순번 변경- 수정필요*/
+delete from playList where userid='bbb' and musicNum=4;
+
+/*게시물테이블*/
+
+DROP TABLE IF EXISTS `article`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `article` (
+  `sequence_no` int(11) NOT NULL,
+  PRIMARY KEY (`sequence_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `board` (
+  `article_id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(100) DEFAULT NULL,
+  `grp` int(11) DEFAULT NULL,
+  `seq` int(11) DEFAULT NULL,
+  `lvl` int(11) DEFAULT NULL,
+  `posting_date` timestamp NULL DEFAULT NULL,
+  `read_count` bigint(1) DEFAULT '0',
+  `writer_name` varchar(45) DEFAULT NULL,
+  `password` varchar(45) DEFAULT NULL,
+  `content` varchar(2048) DEFAULT NULL,
+  `deleted` bigint(1) DEFAULT '0',
+  PRIMARY KEY (`article_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
